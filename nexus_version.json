@@ -1,0 +1,50 @@
+{
+    "_doc": "MANIFESTO DE VERSAO do EKORA. Este arquivo e o ESPELHO que vive no repositorio; a copia que os aparelhos leem fica no Supabase Storage (bucket publico `publico` do projeto de PRODUCAO) e e sobrescrita por `publicar_build.ps1 -SoPublicar` ou `conferir_manifesto.py --corrigir`. O endereco e estavel por CAMINHO: regravar nunca muda a URL. ⚠ `versao` esta CONGELADO em 0.2.41 de proposito — e o campo que os APKs anteriores a 24/08/2026 leem, e move-lo manda instalacoes de `com.ekora.qa` para a ficha de `com.ekora.game`, que e outro pacote. Quem manda hoje e `versao_play`, e ele so anda depois de o rollout estar CONFIRMADO no Console.",
+    "versao": "0.2.41",
+    "minima": "0.1.0",
+    "recado": {
+        "pt_BR": "",
+        "en_US": "",
+        "es_419": ""
+    },
+    "manutencao": {
+        "ativa": false,
+        "ate": "",
+        "recado": {
+            "pt_BR": "",
+            "en_US": ""
+        }
+    },
+    "_publicado_em": "2026-08-24 06:59",
+    "codigo": 241,
+    "tamanho_bytes": 152887793,
+    "notas": {
+        "pt_BR": [
+            "O tutorial agora mostra o caminho de volta ao acampamento quando a missao do Guardiao termina",
+            "Entrar com Google volta sozinho para o jogo",
+            "Novo botao Guardar agora: da para guardar o progresso na nuvem quando quiser",
+            "A loja avisa antes de abrir uma compra sem saldo",
+            "Conta nova comeca com o equipamento certo, sem cadeado",
+            "O jogo roda em muito mais aparelhos e usa bem menos memoria"
+        ],
+        "en_US": [
+            "The tutorial now shows the way back to camp when the Guardian quest ends",
+            "Sign in with Google returns to the game on its own",
+            "New Save now button: keep your progress in the cloud whenever you want",
+            "The shop warns you before opening a purchase you cannot afford",
+            "New accounts start with the right gear, unlocked",
+            "The game runs on many more devices and uses far less memory"
+        ],
+        "es_419": [
+            "El tutorial ahora muestra el camino de vuelta al campamento cuando termina la mision del Guardian",
+            "Iniciar sesion con Google vuelve solo al juego",
+            "Nuevo boton Guardar ahora: guarda tu progreso en la nube cuando quieras",
+            "La tienda avisa antes de abrir una compra sin saldo",
+            "Las cuentas nuevas empiezan con el equipo correcto, sin candado",
+            "El juego corre en muchos mas dispositivos y usa mucha menos memoria"
+        ]
+    },
+    "_commit": "c651dc8e2+sujo",
+    "versao_play": "0.2.50",
+    "_doc_sem_url": "⚠ `url` e `url_qa` saíram em 25/08/2026, com o Google Drive. O botão ATUALIZAR vai sempre à ficha da Play (`app_config.loja`) desde 24/08, e app publicado na loja não pode mandar o jogador buscar pacote fora dela. Manifestos já no ar podem trazer os campos; nada neste build os lê."
+}
