@@ -1,15 +1,15 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KmO2si0nJJHtNbS6K78w/ll5FqGq01HDhB4qZ+5DPcs='; base-uri 'none'; form-action 'none'; connect-src 'none'"><title>EKORA · Conta / Account / Cuenta</title></head><body><p>A página de conta mudou. / The account page has moved. / La página de cuenta cambió.</p><a href="https://contas.ekoragame.online/" rel="noreferrer noopener">Continuar · Continue · Continuar</a><script>(()=>{'use strict';
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fmyV0dYIQ0OUq4OABI5yVd1Wb5ekYnBqoJdOeLngun4='; base-uri 'none'; form-action 'none'; connect-src 'none'"><title>EKORA · Conta / Account / Cuenta</title></head><body><p>A página de conta mudou. / The account page has moved. / La página de cuenta cambió.</p><a href="https://contas.ekoragame.online/" rel="noreferrer noopener">Continuar · Continue · Continuar</a><script>(()=>{'use strict';
 const destination=new URL("https://contas.ekoragame.online/");
 const fragment=new URLSearchParams(location.hash.slice(1));
 const query=new URLSearchParams(location.search);
 const env=fragment.get('env')||query.get('env')||'producao';
 const lang=query.get('lang');
-if(['bancada','producao'].includes(env))destination.searchParams.set('env',env);
+if(env==='bancada')destination.searchParams.set('env',env);
 if(['pt_BR','en_US','es_419'].includes(lang))destination.searchParams.set('lang',lang);
 const token=fragment.get('token_hash')||'';
 const kind=fragment.get('type');
 if(['bancada','producao'].includes(env)&&fragment.getAll('env').length<=1&&fragment.getAll('type').length===1&&fragment.getAll('token_hash').length===1&&/^[a-fA-F0-9]{32,128}$/.test(token)&&['email','signup','recovery','email_change'].includes(kind)){
- destination.hash=new URLSearchParams({env,type:kind,token_hash:token}).toString();
+ destination.hash=new URLSearchParams({...(env==='bancada'?{env}:{}),type:kind,token_hash:token}).toString();
 }
 history.replaceState(null,'',location.pathname);
 location.replace(destination.href);
