@@ -4,6 +4,7 @@
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
   const motion = document.querySelector('.motion-toggle');
   let manualPause = false;
+  let resetHeroMotion = () => {};
   const applyMotion = () => {
     const paused = manualPause || preference.matches;
     motion.hidden = preference.matches;
@@ -11,6 +12,7 @@
     motion.setAttribute('aria-pressed', String(paused));
     motion.setAttribute('aria-label', paused ? motion.dataset.resume : motion.dataset.pause);
     motion.querySelector('span').textContent = paused ? '▷' : 'Ⅱ';
+    if (paused) resetHeroMotion(true);
   };
   motion.addEventListener('click', () => { manualPause = !manualPause; applyMotion(); });
   preference.addEventListener('change', applyMotion);
@@ -58,15 +60,71 @@
     frame.allowFullscreen = true;container.replaceChildren(frame);
   });
   const hero = document.querySelector('.hero');
-  const cast = document.querySelector('.hero-cast');
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine) and (min-width: 900px)');
+  const actors = [...hero.querySelectorAll('.cast')].map(el => ({
+    el, x: 0, y: 0, targetX: 0, targetY: 0,
+    reach: el.classList.contains('cast-main') ? 6 : el.classList.contains('cast-pet') ? 4 : 3
+  }));
   let frame = 0;
-  hero.addEventListener('pointermove', event => {
-    if (event.pointerType !== 'mouse' || preference.matches || manualPause || innerWidth < 900 || frame) return;
-    frame = requestAnimationFrame(() => {
-      const r = hero.getBoundingClientRect();
-      cast.style.setProperty('--px', `${(event.clientX / r.width - .5) * 12}px`);
-      cast.style.setProperty('--py', `${((event.clientY-r.top) / r.height - .5) * 9}px`);frame = 0;
+  let previousTime = 0;
+  const paint = actor => {
+    actor.el.style.setProperty('--mx', `${actor.x.toFixed(3)}px`);
+    actor.el.style.setProperty('--my', `${actor.y.toFixed(3)}px`);
+  };
+  const animate = time => {
+    const elapsed = previousTime ? Math.min(time - previousTime, 64) : 16;
+    previousTime = time;
+    const easing = 1 - Math.exp(-elapsed / 160);
+    let moving = false;
+    actors.forEach(actor => {
+      actor.x += (actor.targetX - actor.x) * easing;
+      actor.y += (actor.targetY - actor.y) * easing;
+      const unsettled = Math.hypot(actor.targetX - actor.x, actor.targetY - actor.y) > .015;
+      if (!unsettled) { actor.x = actor.targetX; actor.y = actor.targetY; }
+      actor.el.classList.toggle('is-reacting', unsettled);
+      paint(actor);
+      moving ||= unsettled;
     });
+    frame = moving ? requestAnimationFrame(animate) : 0;
+    if (!moving) previousTime = 0;
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(animate); };
+  resetHeroMotion = (immediate = false) => {
+    actors.forEach(actor => {
+      actor.targetX = actor.targetY = 0;
+      if (immediate) {
+        actor.x = actor.y = 0;
+        actor.el.classList.remove('is-reacting');
+        paint(actor);
+      }
+    });
+    if (immediate) { cancelAnimationFrame(frame); frame = previousTime = 0; }
+    else if (actors.some(actor => actor.x || actor.y)) schedule();
+  };
+  hero.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || !finePointer.matches || preference.matches || manualPause) return;
+    let nearest = null;
+    let distance = .85;
+    actors.forEach(actor => {
+      const rect = actor.el.getBoundingClientRect();
+      const x = (event.clientX - (rect.left - actor.x + rect.width / 2)) / (rect.width / 2);
+      const y = (event.clientY - (rect.top - actor.y + rect.height / 2)) / (rect.height / 2);
+      const score = Math.hypot(x, y);
+      actor.targetX = actor.targetY = 0;
+      if (score < distance) { distance = score; nearest = { actor, x, y }; }
+    });
+    // Only the nearby character responds; the composition stays anchored.
+    if (nearest) {
+      nearest.actor.targetX = nearest.x * nearest.actor.reach;
+      nearest.actor.targetY = nearest.y * nearest.actor.reach * .65;
+    }
+    schedule();
   });
-  hero.addEventListener('pointerleave', () => {cast.style.setProperty('--px','0px');cast.style.setProperty('--py','0px');});
+  hero.addEventListener('pointerleave', () => resetHeroMotion());
+  hero.addEventListener('pointercancel', () => resetHeroMotion(true));
+  window.addEventListener('scroll', () => resetHeroMotion(), { passive: true });
+  window.addEventListener('resize', () => resetHeroMotion(true), { passive: true });
+  window.addEventListener('blur', () => resetHeroMotion(true));
+  finePointer.addEventListener('change', () => resetHeroMotion(true));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) resetHeroMotion(true); });
 })();
