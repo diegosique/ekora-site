@@ -4,6 +4,20 @@
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
   const motion = document.querySelector('.motion-toggle');
   let manualPause = false;
+  const transitions = new Set();
+  const enterArt = element => {
+    if (preference.matches || manualPause || !element.animate) return;
+    // Cancela só a transição de troca; a animação ambiente pertence ao CSS.
+    for (const animation of transitions) {
+      if (animation.effect.target === element) { animation.cancel(); transitions.delete(animation); }
+    }
+    const animation = element.animate([
+      {opacity: .15, transform: 'translateY(12px) scale(.97)'},
+      {opacity: 1, transform: 'translateY(0) scale(1)'}
+    ], {duration: 480, easing: 'cubic-bezier(.22,1,.36,1)'});
+    transitions.add(animation);
+    animation.finished.catch(() => {}).finally(() => transitions.delete(animation));
+  };
   let resetHeroMotion = () => {};
   const applyMotion = () => {
     const paused = manualPause || preference.matches;
@@ -12,7 +26,11 @@
     motion.setAttribute('aria-pressed', String(paused));
     motion.setAttribute('aria-label', paused ? motion.dataset.resume : motion.dataset.pause);
     motion.querySelector('span').textContent = paused ? '▷' : 'Ⅱ';
-    if (paused) resetHeroMotion(true);
+    if (paused) {
+      resetHeroMotion(true);
+      transitions.forEach(animation => animation.cancel());
+      transitions.clear();
+    }
   };
   motion.addEventListener('click', () => { manualPause = !manualPause; applyMotion(); });
   preference.addEventListener('change', applyMotion);
@@ -30,12 +48,14 @@
     document.querySelector('[data-world-title]').textContent = button.dataset.title;
     document.querySelector('[data-world-body]').textContent = button.dataset.description;
     document.querySelector('[data-world-creature]').src = `assets/${button.dataset.creature}.webp`;
+    enterArt(document.querySelector('[data-world-creature]'));
   }));
   document.querySelectorAll('[data-skin]').forEach(button => button.addEventListener('click', () => {
     document.querySelectorAll('[data-skin]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
     const selected = document.getElementById('selected-echo');
     selected.src = button.querySelector('img').src;
     selected.alt = button.dataset.name;
+    enterArt(selected);
     document.getElementById('echo-name').textContent = button.dataset.name;
     document.getElementById('echo-count').textContent = button.dataset.number;
     document.querySelector('.echo-aura').style.background = `radial-gradient(ellipse, ${button.dataset.color}35, transparent 67%)`;
@@ -60,6 +80,14 @@
     frame.allowFullscreen = true;container.replaceChildren(frame);
   });
   const hero = document.querySelector('.hero');
+  // Fora da tela, as ilustrações não precisam gastar quadros de animação.
+  if ('IntersectionObserver' in window) {
+    const ambientObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      entry.target.classList.toggle('ambient-sleep', !entry.isIntersecting);
+      if (entry.target === hero && !entry.isIntersecting) resetHeroMotion(true);
+    }));
+    document.querySelectorAll('.hero, .world-stage, .echo-showcase').forEach(el => ambientObserver.observe(el));
+  }
   const finePointer = matchMedia('(hover: hover) and (pointer: fine) and (min-width: 900px)');
   const actors = [...hero.querySelectorAll('.cast')].map(el => ({
     el, x: 0, y: 0, targetX: 0, targetY: 0,
@@ -124,7 +152,11 @@
   hero.addEventListener('pointercancel', () => resetHeroMotion(true));
   window.addEventListener('scroll', () => resetHeroMotion(), { passive: true });
   window.addEventListener('resize', () => resetHeroMotion(true), { passive: true });
-  window.addEventListener('blur', () => resetHeroMotion(true));
+  window.addEventListener('blur', () => {root.classList.add('motion-sleep');resetHeroMotion(true);});
+  window.addEventListener('focus', () => root.classList.remove('motion-sleep'));
   finePointer.addEventListener('change', () => resetHeroMotion(true));
-  document.addEventListener('visibilitychange', () => { if (document.hidden) resetHeroMotion(true); });
+  document.addEventListener('visibilitychange', () => {
+    root.classList.toggle('motion-sleep', document.hidden);
+    if (document.hidden) resetHeroMotion(true);
+  });
 })();
