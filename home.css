@@ -25,3 +25,11 @@
 @media(max-width:600px){.cast-main{left:0;width:61%}.cast-back{right:0;width:53%}.cast-pet{right:6%}}
 @media(max-width:1150px){.camp-scene .camp-pet{right:-2%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.cast{transform:rotate(var(--rest-angle,0deg))!important}.js-motion .reveal.pending{opacity:1;transform:none}}
+
+/* Local trailer artwork remains visible until explicit playback consent. */
+.video-container:has(.video-consent){aspect-ratio:auto;min-height:0}
+.video-consent{width:100%;max-width:none;padding:0}
+.video-poster{width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}
+.video-consent-actions{padding:20px clamp(16px,4vw,32px) 24px}
+.video-consent-actions p{margin:0 auto 18px;max-width:600px}
+.video-consent-actions .button{max-width:100%;white-space:normal}
