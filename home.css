@@ -28,4 +28,7 @@
 @media(max-width:650px){.battle-orbit{display:none}.journey-nav a{padding:18px 10px;gap:12px}}
 @media(max-width:360px){.journey-nav a{gap:8px}}
 @media(min-width:651px) and (max-width:950px){.hero{min-height:0;max-height:none;padding-bottom:22px}.hero-content{position:relative;inset:auto;width:calc(100% - 64px);max-width:540px;margin:30px auto 0;text-align:center}.hero .actions{justify-content:center}.hero-store{margin:16px 0 0}.hero-status{justify-content:center}.hero-cast{position:relative;inset:auto;transform:none;width:580px;height:400px;margin:30px auto 0}.hero-film{position:relative;inset:auto;display:flex;gap:20px;align-items:center;width:500px;margin:24px auto}.hero-film>img{width:190px}.film-caption{margin:0;width:100%}.hero-bottom{position:relative;inset:auto;margin-top:20px}}
+/* A terceira rede ganha outra linha sem ocupar a navegação inferior. */
+.hero-content .social-links{row-gap:4px}
+@media(min-width:951px){.hero{min-height:960px}.hero-content{top:38%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.cast{transform:rotate(var(--rest-angle,0deg))!important}.js-motion .reveal.pending{opacity:1;transform:none}}
